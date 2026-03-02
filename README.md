@@ -17,11 +17,19 @@ A devcontainer for developing and testing Home Assistant custom cards.
 
 This repository includes a `.devcontainer/devcontainer.json` you can use directly or adapt for your own project.
 
+The image is published to the [GitHub Container Registry](https://ghcr.io/custom-cards/custom-card-devcontainer) on every tagged release. Images are tagged with the full version (`1.2.3`), minor version (`1.2`), and `latest`.
+
+For reproducible environments, pin to a specific version tag:
+
+```bash
+docker pull ghcr.io/custom-cards/custom-card-devcontainer:1.2.3
+```
+
 For your own custom card project, add a `.devcontainer/devcontainer.json`:
 
 ```json
 {
-  "image": "ghcr.io/custom-cards/custom-card-devcontainer",
+  "image": "ghcr.io/custom-cards/custom-card-devcontainer:1.2.3",
   "forwardPorts": [8123],
   "postCreateCommand": "container setup",
   "remoteUser": "vscode",
