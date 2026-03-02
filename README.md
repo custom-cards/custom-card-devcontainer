@@ -25,6 +25,17 @@ For reproducible environments, pin to a specific version tag:
 docker pull ghcr.io/custom-cards/custom-card-devcontainer:1.2.3
 ```
 
+### Beta / pre-release images
+
+Pre-release tags (e.g. `v1.2.3-beta.1`) are published with the exact version and a floating `beta` tag. The `latest` tag is **not** updated for pre-releases.
+
+To test a beta image, use the `beta` tag or pin to the exact pre-release version:
+
+```bash
+docker pull ghcr.io/custom-cards/custom-card-devcontainer:beta
+docker pull ghcr.io/custom-cards/custom-card-devcontainer:1.2.3-beta.1
+```
+
 For your own custom card project, add a `.devcontainer/devcontainer.json`:
 
 ```json
