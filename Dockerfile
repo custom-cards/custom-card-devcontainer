@@ -2,7 +2,8 @@ FROM mcr.microsoft.com/devcontainers/python:1-3.13
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-RUN apt-get update \
+RUN rm -f /etc/apt/sources.list.d/yarn.list \
+    && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         bluez \
         libffi-dev \
