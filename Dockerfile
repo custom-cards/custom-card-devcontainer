@@ -43,7 +43,7 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 COPY requirements.txt /tmp/requirements.txt
 RUN uv pip install -r /tmp/requirements.txt
 
-COPY container /usr/local/bin/container
-COPY hassfest /usr/local/bin/hassfest
+COPY --chmod=0755 container /usr/local/bin/container
+COPY --chmod=0755 hassfest /usr/local/bin/hassfest
 
 CMD ["sudo", "-E", "container"]
