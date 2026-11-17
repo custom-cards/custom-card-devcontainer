@@ -1,19 +1,20 @@
 #!/bin/bash
 
 function ensure_hass_config() {
-    hass --script ensure_config -c /config
+    mkdir -p "${CONFIG_DIR}"
+    hass --script ensure_config -c "${CONFIG_DIR}"
 }
 
 function create_hass_user() {
     local username="${HASS_USERNAME:-dev}"
     local password="${HASS_PASSWORD:-dev}"
     echo "Creating Home Assistant user ${username}"
-    hass --script auth -c /config add "${username}" "${password}"
+    hass --script auth -c "${CONFIG_DIR}" add "${username}" "${password}"
 }
 
 function bypass_onboarding() {
-    mkdir -p /config/.storage
-    cat > /config/.storage/onboarding << 'EOF'
+    mkdir -p "${CONFIG_DIR}/.storage"
+    cat > "${CONFIG_DIR}/.storage/onboarding" << 'EOF'
 {
     "data": {
         "done": [
@@ -29,7 +30,7 @@ EOF
 }
 
 function install_hacs() {
-    local hacs_dir="/config/custom_components/hacs"
+    local hacs_dir="${CONFIG_DIR}/custom_components/hacs"
     local hacs_manifest="${hacs_dir}/manifest.json"
 
     echo "Checking HACS version..."
@@ -39,7 +40,8 @@ function install_hacs() {
 
     if [[ -z "${latest_version}" ]]; then
         echo "Warning: Could not determine latest HACS version (network issue or API rate limit). Installing via get.hacs.xyz..."
-        curl -sfSL https://get.hacs.xyz | bash -
+        # get.hacs.xyz looks for configuration.yaml in the current directory
+        (cd "${CONFIG_DIR}" && curl -sfSL https://get.hacs.xyz | bash -)
         return
     fi
 
@@ -67,7 +69,7 @@ function install_lovelace_resources() {
     local resources=()
 
     if [[ -n "${LOVELACE_LOCAL_FILES:-}" ]]; then
-        mkdir -p /config/www/workspace
+        mkdir -p "${CONFIG_DIR}/www/workspace"
         for file in ${LOVELACE_LOCAL_FILES}; do
             resources+=("/local/workspace/${file}")
         done
@@ -83,14 +85,15 @@ function install_lovelace_resources() {
         return
     fi
 
-    mkdir -p /config/.storage
-    python3 - "${resources[@]}" << 'PYEOF'
+    mkdir -p "${CONFIG_DIR}/.storage"
+    python3 - "${CONFIG_DIR}" "${resources[@]}" << 'PYEOF'
 import sys, json
 
-urls = sys.argv[1:]
+config_dir = sys.argv[1]
+urls = sys.argv[2:]
 items = [{"id": str(i + 1), "type": "module", "url": url} for i, url in enumerate(urls)]
 storage = {"data": {"items": items}, "key": "lovelace_resources", "version": 1}
-with open("/config/.storage/lovelace_resources", "w") as f:
+with open(f"{config_dir}/.storage/lovelace_resources", "w") as f:
     json.dump(storage, f, indent=4)
 PYEOF
 }
@@ -104,12 +107,14 @@ function setup() {
 }
 
 function run() {
-    hass -c /config -v
+    hass -c "${CONFIG_DIR}" -v
 }
 
 if [[ -f "${ENV_FILE:-}" ]]; then
     source "${ENV_FILE}"
 fi
+
+CONFIG_DIR="${HASS_CONFIG_DIR:-/config}"
 
 case "${1:-}" in
     setup)

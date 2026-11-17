@@ -27,6 +27,10 @@ RUN rm -f /etc/apt/sources.list.d/yarn.list \
     && rm -rf /var/lib/apt/lists/* \
     && source /usr/local/share/nvm/nvm.sh \
     && nvm install --lts \
+    # Node.js 25+ no longer bundles corepack; install it so projects pinning
+    # "packageManager" (e.g. yarn 4) keep working
+    && npm install -g corepack \
+    && corepack enable \
     && pip install --upgrade wheel pip uv
 
 COPY --from=ghcr.io/alexxit/go2rtc:latest /usr/local/bin/go2rtc /bin/go2rtc

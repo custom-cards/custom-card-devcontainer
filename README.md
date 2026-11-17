@@ -69,12 +69,23 @@ docker run --rm -it \
 |------|-------------|---------|
 | `HASS_USERNAME` | Username of the default Home Assistant user | `dev` |
 | `HASS_PASSWORD` | Password of the default Home Assistant user | `dev` |
-| `LOVELACE_LOCAL_FILES` | Space-separated list of filenames in `/config/www/workspace` to register as Lovelace resources | Empty |
+| `HASS_CONFIG_DIR` | Home Assistant configuration directory used by `container` and `hassfest` | `/config` |
+| `LOVELACE_LOCAL_FILES` | Space-separated list of filenames in `$HASS_CONFIG_DIR/www/workspace` to register as Lovelace resources | Empty |
 | `LOVELACE_REMOTE_FILES` | Space-separated list of full URLs for remotely served Lovelace resources (e.g. a local dev server) | Empty |
+
+### HASS_CONFIG_DIR
+
+Point Home Assistant at a config directory inside your workspace instead of `/config`. This avoids bind-mounting a config folder, so the devcontainer also works with **Dev Containers: Clone Repository in Container Volume**, where `${localWorkspaceFolder}` is not a path on the host.
+
+```json
+"containerEnv": {
+  "HASS_CONFIG_DIR": "${containerWorkspaceFolder}/.devcontainer/config"
+}
+```
 
 ### LOVELACE_LOCAL_FILES
 
-Use this for the card file(s) you are actively developing. The files must be present in your workspace, which is mounted at `/config/www/workspace`.
+Use this for the card file(s) you are actively developing. The files must be present in your workspace, which is mounted at `$HASS_CONFIG_DIR/www/workspace` (`/config/www/workspace` by default).
 
 ```
 LOVELACE_LOCAL_FILES="my-card.js other-card.js"
@@ -94,7 +105,7 @@ LOVELACE_REMOTE_FILES="http://localhost:5000/my-card.js http://localhost:5001/ot
 |---------|-------------|
 | `container` | Set up Home Assistant and launch it |
 | `container setup` | Perform setup (config, user, HACS, Lovelace resources) without launching |
-| `container launch` | Launch Home Assistant with `hass -c /config -v` |
+| `container launch` | Launch Home Assistant with `hass -c $HASS_CONFIG_DIR -v` |
 
 ## hassfest
 
@@ -104,4 +115,4 @@ If you are also developing a custom integration, you can validate it with:
 hassfest
 ```
 
-This will clone the Home Assistant source on first run (into `/usr/src/homeassistant`) and run `hassfest` validation against any integrations found in `/config/custom_components`.
+This will clone the Home Assistant source on first run (into `/usr/src/homeassistant`) and run `hassfest` validation against any integrations found in `$HASS_CONFIG_DIR/custom_components`.
