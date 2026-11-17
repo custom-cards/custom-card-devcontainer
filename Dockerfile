@@ -37,7 +37,11 @@ COPY --from=ghcr.io/alexxit/go2rtc:latest /usr/local/bin/go2rtc /bin/go2rtc
 
 EXPOSE 8123
 
-VOLUME /config
+# Default HASS_CONFIG_DIR. Owned by vscode so `container setup` works as the
+# remote user. Not a VOLUME: projects can mount it or set HASS_CONFIG_DIR, and
+# declaring it left an unused anonymous volume behind for every container.
+RUN mkdir -p /config/www \
+    && chown -R vscode:vscode /config
 
 USER vscode
 ENV VIRTUAL_ENV="/home/vscode/.local/ha-venv"
