@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# The image's default CMD runs this script through `sudo -E`, and sudo's
+# secure_path drops the Home Assistant venv from PATH. Put it back so `hass`
+# resolves whether we run as root or as vscode.
+export PATH="${VIRTUAL_ENV:-/home/vscode/.local/ha-venv}/bin:${PATH}"
+
 function ensure_hass_config() {
     mkdir -p "${CONFIG_DIR}"
     hass --script ensure_config -c "${CONFIG_DIR}"
