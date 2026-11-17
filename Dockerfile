@@ -31,6 +31,11 @@ RUN rm -f /etc/apt/sources.list.d/yarn.list \
     # "packageManager" (e.g. yarn 4) keep working
     && npm install -g corepack \
     && corepack enable \
+    # nvm installed Node as root; let the nvm group (which includes vscode)
+    # write to it so `npm install -g` and `corepack enable` work as vscode
+    && chgrp -R nvm "${NVM_DIR}" \
+    && chmod -R g+rwX "${NVM_DIR}" \
+    && find "${NVM_DIR}" -type d -exec chmod g+s {} + \
     && pip install --upgrade wheel pip uv
 
 COPY --from=ghcr.io/alexxit/go2rtc:latest /usr/local/bin/go2rtc /bin/go2rtc
