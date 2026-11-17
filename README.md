@@ -19,6 +19,8 @@ This repository includes a `.devcontainer/devcontainer.json` you can use directl
 
 The image is published to the [GitHub Container Registry](https://ghcr.io/custom-cards/custom-card-devcontainer) on every tagged release. Images are tagged with the full version (`1.2.3`), minor version (`1.2`), and `latest`.
 
+Published images are multi-architecture and include `linux/amd64` and `linux/arm64`.
+
 For reproducible environments, pin to a specific version tag:
 
 ```bash
